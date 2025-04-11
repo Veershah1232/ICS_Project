@@ -67,127 +67,200 @@ struct treeNode* gotonode(struct treeNode* root, struct treeNode* ptr, int depth
     return ptr; 
 }
 
-void executeTree(struct treeNode* root){
+void executeTree(struct treeNode* root) {
 
     NodeType type;
     struct treeNode* ptr = root;
-    int current_depth=0;
+    int current_depth = 0;
 
     while (ptr != NULL) {
         if (strcmp(ptr->type, "PROGRAM") == 0) {
-            // PROGRAM: Start of the program, go to statement list
             ptr = ptr->left;
         }
         else if (strcmp(ptr->type, "VAR_DEC") == 0) {
-            if (strcmp(ptr->value, "IDENTIFIER")==0){
-                if (strcmp(ptr->left, "exp")==0){
+            if (strcmp(ptr->value, "IDENTIFIER") == 0) {
+                if (strcmp(ptr->left, "exp") == 0) {
                     // check inside all the struct vectors if there is a variable name that matches
                     // return no 
-                }
-                else{
+                } else {
                     // write code for ll_get
                 }
-            }
-            else{
+            } else {
                 // ask how to handle statements
             }
             ptr = ptr->next;
         }
         else if (strcmp(ptr->type, "LIST_DEC") == 0) {
-            // LIST_DEC: Declare a list with initial value from exp
             ptr = ptr->next;
         }
         else if (strcmp(ptr->type, "LL_DEC") == 0) {
-            // LL_DEC: Declare a linked list
             ptr = ptr->next;
         }
         else if (strcmp(ptr->type, "DICT_DEC") == 0) {
-            // DICT_DEC: Declare a dictionary
             ptr = ptr->next;
         }
         else if (strcmp(ptr->type, "SHOW") == 0) {
-            // SHOW: Output string and values from exp_list
             ptr = ptr->next;
         }
         else if (strcmp(ptr->type, "ASK") == 0) {
-            // ASK: Input into variable(s) from user
             ptr = ptr->next;
         }
         else if (strcmp(ptr->type, "ASSIGN") == 0) {
-            // ASSIGN: Assign a value or perform linked list get
-            // Handle assignment types (IDENTIFIER, INDEX, LL_GET)
             ptr = ptr->next;
         }
         else if (strcmp(ptr->type, "IF") == 0) {
-            // IF: Evaluate condition and execute block if true
+            ptr = ptr->left;
+            executeTree(ptr);
+            gotonode(root, ptr, current_depth);
+            ptr = ptr->right;
+            executeTree(ptr);
+            gotonode(root, ptr, current_depth);
             ptr = ptr->next;
         }
         else if (strcmp(ptr->type, "IF-ELSE") == 0) {
-            // IF-ELSE: Evaluate condition and execute correct block
+            // evaluate condition, then either left or right block
             ptr = ptr->next;
         }
         else if (strcmp(ptr->type, "WHILE") == 0) {
-            // WHILE: Execute block while condition is true
+            // use gotonode to loop while evaluating condition and executing block
             ptr = ptr->next;
         }
         else if (strcmp(ptr->type, "FOR") == 0) {
-            // FOR: Execute loop using loop info and block
+            ptr = ptr->next;
+        }
+        else if (strcmp(ptr->type, "LOOP_INFO") == 0) {
+            // used inside for loop, contains VAR and RANGE
+            ptr = ptr->next;
+        }
+        else if (strcmp(ptr->type, "RANGE") == 0) {
+            // define start and end of range
             ptr = ptr->next;
         }
         else if (strcmp(ptr->type, "NEXT") == 0) {
-            // NEXT: Continue to next iteration of loop
             ptr = ptr->next;
         }
         else if (strcmp(ptr->type, "LEAVE") == 0) {
-            // LEAVE: Break out of current loop
             ptr = ptr->next;
         }
         else if (strcmp(ptr->type, "FUNC_DEC") == 0) {
-            // FUNC_DEC: Store function definition for later calls
+            ptr = ptr->next;
+        }
+        else if (strcmp(ptr->type, "FUNC_DATA") == 0) {
+            // contains parameters and return type
+            ptr = ptr->next;
+        }
+        else if (strcmp(ptr->type, "RET_TYPE") == 0) {
+            // type returned by function
             ptr = ptr->next;
         }
         else if (strcmp(ptr->type, "CALL") == 0) {
-            // CALL: Call a function with arguments
             ptr = ptr->next;
         }
         else if (strcmp(ptr->type, "RETURN") == 0) {
-            // RETURN: Return a value from function
             ptr = ptr->next;
         }
         else if (strcmp(ptr->type, "LL_SORT") == 0) {
-            // LL_SORT: Sort a linked list
             ptr = ptr->next;
         }
         else if (strcmp(ptr->type, "LL_SEARCH") == 0) {
-            // LL_SEARCH: Search in linked list
             ptr = ptr->next;
         }
         else if (strcmp(ptr->type, "LL_INSERT") == 0) {
-            // LL_INSERT: Insert into linked list
             ptr = ptr->next;
         }
         else if (strcmp(ptr->type, "LL_SET") == 0) {
-            // LL_SET: Set value at index in linked list
             ptr = ptr->next;
         }
         else if (strcmp(ptr->type, "LL_DEL") == 0) {
-            // LL_DEL: Delete node from linked list
             ptr = ptr->next;
         }
-        else if (strcmp(ptr->type, "BLOCK") == 0) {
-            // BLOCK: A set of statements, execute recursively
-            executeTree(ptr->left); // block body
+        else if (strcmp(ptr->type, "LL_GET") == 0) {
+            // used inside expressions or assignments
             ptr = ptr->next;
         }
+        else if (strcmp(ptr->type, "RBLOCK") == 0) {
+            executeTree(ptr->right);
+            gotonode(root, ptr, current_depth);
+        }
+        else if (strcmp(ptr->type, "LBLOCK") == 0) {
+            executeTree(ptr->left);
+            gotonode(root, ptr, current_depth);
+        }
+        else if (strcmp(ptr->type, "EXP") == 0) {
+            // root of expression subtree
+            ptr = ptr->next;
+        }
+        else if (strcmp(ptr->type, "PARAMETER") == 0) {
+            // single function parameter (IDENTIFIER and DATATYPE)
+            ptr = ptr->next;
+        }
+        else if (strcmp(ptr->type, "PARAMETERS") == 0) {
+            // list of parameters
+            ptr = ptr->next;
+        }
+        else if (strcmp(ptr->type, "ARGUMENTS") == 0) {
+            // list of arguments passed in a call
+            ptr = ptr->next;
+        }
+        else if (strcmp(ptr->type, "VAR") == 0) {
+            // use of a variable
+            ptr = ptr->next;
+        }
+        else if (strcmp(ptr->type, "INDEX") == 0) {
+            // access via index (e.g., list[i], dict[key])
+            ptr = ptr->next;
+        }
+        else if (strcmp(ptr->type, "ADDRESS") == 0) {
+            // &variable (pointer address)
+            ptr = ptr->next;
+        }
+        else if (strcmp(ptr->type, "DEREFERENCE") == 0) {
+            // *pointer
+            ptr = ptr->next;
+        }
+
+        // constants
+        else if (strcmp(ptr->type, "INT") == 0 ||
+                 strcmp(ptr->type, "CHAR") == 0 ||
+                 strcmp(ptr->type, "FLOAT") == 0 ||
+                 strcmp(ptr->type, "STR") == 0) {
+            // literal constant values
+            ptr = ptr->next;
+        }
+
+        // binary expressions
+        else if (strcmp(ptr->type, "ADD") == 0 ||
+                 strcmp(ptr->type, "SUB") == 0 ||
+                 strcmp(ptr->type, "MULT") == 0 ||
+                 strcmp(ptr->type, "DIV") == 0 ||
+                 strcmp(ptr->type, "MOD") == 0 ||
+                 strcmp(ptr->type, "LT") == 0 ||
+                 strcmp(ptr->type, "LTE") == 0 ||
+                 strcmp(ptr->type, "GT") == 0 ||
+                 strcmp(ptr->type, "GTE") == 0 ||
+                 strcmp(ptr->type, "EQ") == 0 ||
+                 strcmp(ptr->type, "NEQ") == 0 ||
+                 strcmp(ptr->type, "AND") == 0 ||
+                 strcmp(ptr->type, "OR") == 0) {
+            // evaluate left and right expressions
+            ptr = ptr->next;
+        }
+
+        // data type markers
+        else if (strcmp(ptr->type, "DATATYPE") == 0) {
+            ptr = ptr->next;
+        }
+        else if (strcmp(ptr->type, "TYPE_TOKEN") == 0) {
+            // base type (int, float, char, string, list, ptr, etc.)
+            ptr = ptr->next;
+        }
+
         else {
-            // Unknown node type or expression handling
-            // Handle EXP, PARAMETER, ARGUMENTS, etc., if needed
+            fprintf(stderr, "Unhandled node type: %s\n", ptr->type);
             ptr = ptr->next;
         }
+
+        current_depth++;
     }
     return 0;
 }
-
-    
-
-
